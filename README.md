@@ -23,6 +23,9 @@ A full-stack MERN (MongoDB, Express, React, Node.js) application for creating, t
 ```bash
 git clone https://github.com/digeesh038/drill-app.git
 cd drill-app
+```
+
+---- 
 
 2. Configure Environment Variables
 
@@ -196,12 +199,3 @@ Answer Object
 Field	Type	Description
 questionId	Number	ID of the question
 answer	String	User-provided answer
-5. Contact
-
-👤 Digeesh S
-
-GitHub: digeesh038
-
-Email: digeesh038@gmail.com
-
-LinkedIn: digeesh-s
