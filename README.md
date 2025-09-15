@@ -40,7 +40,7 @@ MONGO_URI=your_mongodb_connection_string
 frontend/.env
 
 ```
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:3001/api
 ```
 
 Replace your_mongodb_connection_string with your MongoDB URI.
@@ -66,7 +66,7 @@ npm install
 cd backend
 npm run dev
 ```
-API runs at: http://localhost:5000/api
+API runs at: http://localhost:3001/api
 
 **Start the Frontend App**
 ```bash
@@ -148,7 +148,7 @@ Frontend runs at: http://localhost:5173 (Vite default)
 
 **Create a Drill**
 ```bash
-curl -X POST http://localhost:5000/api/drills \
+curl -X POST http://localhost:3001/api/drills \
 -H "Content-Type: application/json" \
 -d '{
   "drillId": 1,
@@ -164,7 +164,7 @@ curl -X POST http://localhost:5000/api/drills \
 
 **Submit Answers**
 ```bash
-curl -X POST http://localhost:5000/api/answers \
+curl -X POST http://localhost:3001/api/answers \
 -H "Content-Type: application/json" \
 -d '{
   "drillId": 1,
