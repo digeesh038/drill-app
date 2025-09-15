@@ -174,38 +174,3 @@ curl -X POST http://localhost:3001/api/answers \
   ]
 }'
 ```
-
-### 4.2 Data Structure
-
-**Drill Object**
-
-| Field     | Type          | Description                   |
-|-----------|---------------|-------------------------------|
-| drillId   | Number        | Unique drill identifier       |
-| title     | String        | Drill title                  |
-| difficulty| String        | Difficulty level (Easy, Medium, Hard) |
-| tags      | Array[String] | List of relevant tags        |
-| questions | Array[Object] | List of questions in the drill |
-
-**Question Object**
-
-| Field         | Type   | Description              |
-|---------------|--------|--------------------------|
-| id            | Number | Unique question ID       |
-| text          | String | Question text            |
-| correctAnswer | String | Correct answer (optional)|
-
-**Answer Submission Object**
-
-| Field   | Type         | Description                        |
-|---------|--------------|------------------------------------|
-| drillId | Number       | Drill ID for which answers are submitted |
-| answers | Array[Object]| List of answers for each question  |
-
-**Answer Object**
-
-| Field      | Type   | Description        |
-|------------|--------|------------------|
-| questionId | Number | ID of the question|
-| answer     | String | User-provided answer|
-
