@@ -1,0 +1,48 @@
+#! backend-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: backend
+    namespace: minidrill
+    labels:
+        com.docker.compose.project: minidrill
+        com.docker.compose.service: backend
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: minidrill
+            com.docker.compose.service: backend
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: minidrill
+                com.docker.compose.service: backend
+                com.docker.compose.network.mini-network: "true"
+        spec:
+            containers:
+                - name: mini-backend
+                  image: minidrill-backend
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: GOOGLE_CLIENT_ID
+                      value: "your_google_client_id"
+                    - name: GOOGLE_CLIENT_SECRET
+                      value: "your_google_client_secret"
+                    - name: MONGO_URI
+                      value: "mongodb://mongo:27017/minidrill"
+                    - name: SESSION_SECRET
+                      value: "keyboardcat"
+                  ports:
+                    - name: backend-3001
+                      containerPort: 3001
+                  volumeMounts:
+                    - name: app
+                      mountPath: /app
+            volumes:
+                - name: app
+                  hostPath:
+                    path: D:\mini drill\backend
