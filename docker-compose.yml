@@ -1,6 +1,9 @@
+version: '3.9'
+
 services:
   backend:
     build: ./backend
+    container_name: mini-backend
     ports:
       - "3001:3001"
     volumes:
@@ -9,12 +12,40 @@ services:
       - SESSION_SECRET=keyboardcat
       - GOOGLE_CLIENT_ID=your_google_client_id
       - GOOGLE_CLIENT_SECRET=your_google_client_secret
+      - MONGO_URI=mongodb://mongo:27017/minidrill
+    depends_on:
+      - mongo
+    networks:
+      - mini-network
 
   frontend:
     build: ./frontend
+    container_name: mini-frontend
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
     environment:
-      - VITE_API_URL=http://localhost:3001/api
+      - VITE_API_URL=http://backend:3001/api
+    depends_on:
+      - backend
+    networks:
+      - mini-network
+
+  mongo:
+    image: mongo:6.0
+    container_name: mini-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - mini-network
+
+volumes:
+  mongo-data:
+
+networks:
+  mini-network:
+    driver: bridge
