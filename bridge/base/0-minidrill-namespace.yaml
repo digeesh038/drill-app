@@ -1,8 +1,0 @@
-#! 0-minidrill-namespace.yaml
-# Generated code, do not edit
-apiVersion: v1
-kind: Namespace
-metadata:
-    name: minidrill
-    labels:
-        com.docker.compose.project: minidrill

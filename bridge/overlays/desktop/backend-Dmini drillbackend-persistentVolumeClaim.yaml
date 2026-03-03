@@ -1,9 +1,0 @@
-#! backend-D:\mini drill\backend-persistentVolumeClaim.yaml
-# Generated code, do not edit
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-    name: backend-d--mini-drill-backend
-    namespace: minidrill
-spec:
-    storageClassName: "hostpath" # see docker/desktop-storage-provisioner
