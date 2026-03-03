@@ -21,6 +21,7 @@ passport.use(
                     user = await User.create({
                         email: profile.emails[0].value,
                         name: profile.displayName,
+                        providers: [{ provider: "google", providerId: profile.id }]
                     });
                 }
 

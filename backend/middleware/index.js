@@ -4,20 +4,31 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 
 function applyMiddleware(app) {
-  // Security headers (lightweight to avoid 431 error)
+  // Security headers (MINIMAL to keep headers under limit)
   app.use(helmet({
-    crossOriginResourcePolicy: false,
     contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: false,
+    originAgentCluster: false,
+    dnsPrefetchControl: false,
+    frameguard: false,
+    hidePoweredBy: true,
+    hsts: false, // Disable HSTS to save header space
+    ieNoOpen: false,
+    noSniff: false,
+    referrerPolicy: false,
+    xssFilter: false
   }));
 
-  // ✅ Clean CORS (Production + Local)
+  // ✅ CORS optimized for cross-domain sessions
   app.use(
     cors({
-      origin: [
-        "http://localhost:5173",
-        process.env.FRONTEND_URL,
-      ],
+      origin: "https://drill-app.vercel.app", // Use explicit URL to save space
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+      maxAge: 86400
     })
   );
 

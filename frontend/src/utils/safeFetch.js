@@ -2,7 +2,7 @@ export const safeFetch = async (url, options = {}) => {
     try {
         const res = await fetch(url, {
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
+            headers: options.method && options.method !== 'GET' ? { "Content-Type": "application/json" } : {},
             ...options,
         });
         if (!res.ok) return null;
