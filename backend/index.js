@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
+
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -20,26 +21,35 @@ mongoose.connect(process.env.DB_URI)
 
     const app = express();
 
+    // Required for Render (behind proxy)
+    app.set("trust proxy", 1);
+
     // Parse JSON and URL-encoded bodies
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
-    // Apply any custom middleware
+    // Apply custom middleware
     applyMiddleware(app);
 
-    // Enable CORS for React frontend with credentials
+    // CORS setup (Production + Local)
     app.use(cors({
-      origin: "http://localhost:5173",
-      credentials: "include"
+      origin: process.env.FRONTEND_URL, // from Render env
+      credentials: true
     }));
 
-    // SESSION + PASSPORT setup
+    // Session setup
     app.use(session({
-      secret: process.env.SESSION_SECRET || "keyboard cat",
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
-      cookie: { secure: false, httpOnly: true} 
+      cookie: {
+        secure: true,          // required for HTTPS (Render)
+        httpOnly: true,
+        sameSite: "none"       // required for cross-site cookies
+      }
     }));
+
+    // Passport
     app.use(passport.initialize());
     app.use(passport.session());
 
@@ -50,6 +60,10 @@ mongoose.connect(process.env.DB_URI)
     app.use("/api/me", meRouter);
     app.use("/api/auth", authRouter);
 
-    app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   })
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+  .catch(err =>
+    console.error("❌ MongoDB connection error:", err)
+  );
