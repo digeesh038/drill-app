@@ -26,15 +26,16 @@ mongoose.connect(process.env.DB_URI)
     // Apply middleware (helmet, cors, rateLimit, json)
     applyMiddleware(app);
 
-    // Session setup
     app.use(session({
-      secret: process.env.SESSION_SECRET,
+      secret: process.env.SESSION_SECRET || "default_secret",
       resave: false,
       saveUninitialized: false,
+      proxy: true, // Required for Render
       cookie: {
-        secure: process.env.NODE_ENV === "production", // Secure only in prod
+        secure: true,
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
+        sameSite: "none",
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
       }
     }));
 

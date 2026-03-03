@@ -4,8 +4,11 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 
 function applyMiddleware(app) {
-  // Security headers
-  app.use(helmet());
+  // Security headers (lightweight to avoid 431 error)
+  app.use(helmet({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: false,
+  }));
 
   // ✅ Clean CORS (Production + Local)
   app.use(
