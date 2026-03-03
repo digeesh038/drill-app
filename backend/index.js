@@ -46,7 +46,6 @@ mongoose.connect(process.env.DB_URI)
     app.use("/api/health", healthRouter);
     app.use("/api/drills", drillsRouter);
     app.use("/api/attempts", attemptsRouter);
-    app.use("/api/me", meRouter);
     app.use("/api/auth", authRouter);
 
     app.listen(PORT, () =>
