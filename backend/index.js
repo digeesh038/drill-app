@@ -58,9 +58,9 @@ mongoose.connect(process.env.DB_URI)
       saveUninitialized: false,
       proxy: true,
       cookie: {
-        secure: process.env.NODE_ENV === "production", // Secure only in prod
+        secure: true, // Required for Brave/Chrome SameSite: none
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        sameSite: "none", // Critical for Cross-Domain Cookies (Vercel to Render)
         maxAge: 24 * 60 * 60 * 1000
       }
     }));
