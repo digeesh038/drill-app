@@ -32,9 +32,9 @@ mongoose.connect(process.env.DB_URI)
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: true,      // HTTPS required
+        secure: process.env.NODE_ENV === "production", // Secure only in prod
         httpOnly: true,
-        sameSite: "none"   // Required for cross-domain
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
       }
     }));
 
