@@ -60,7 +60,7 @@ function App() {
   // --- Check session
   useEffect(() => {
     const checkSession = async () => {
-      const me = await safeFetch(`${API_URL}/api/auth/me`);
+      const me = await safeFetch(`${API_URL}/auth/me`);
       setUser(me?.email ? me : null);
     };
     checkSession();
@@ -71,13 +71,13 @@ function App() {
     if (user) {
       const loadDrills = async () => {
         setLoadingDrills(true);
-        const data = await safeFetch(`${API_URL}/api/drills`);
+        const data = await safeFetch(`${API_URL}/drills`);
         if (data) setDrills(data);
         setLoadingDrills(false);
       };
 
       const loadHistory = async () => {
-        const data = await safeFetch(`${API_URL}/api/attempts`);
+        const data = await safeFetch(`${API_URL}/attempts`);
         if (data) setHistory(data);
       };
 
@@ -86,10 +86,10 @@ function App() {
     }
   }, [user]);
 
-  const handleSignIn = () => window.location.href = `${API_URL}/api/auth/google`;
+  const handleSignIn = () => window.location.href = `${API_URL}/auth/google`;
 
   const handleLogout = async (navigate) => {
-    await safeFetch(`${API_URL}/api/auth/logout`);
+    await safeFetch(`${API_URL}/auth/logout`);
     setUser(null);
     navigate("/");
   };
