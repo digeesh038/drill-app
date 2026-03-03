@@ -21,10 +21,13 @@ function applyMiddleware(app) {
     xssFilter: false
   }));
 
-  // ✅ CORS optimized for cross-domain sessions
+  // ✅ CORS optimized for cross-domain sessions (Local + Production)
   app.use(
     cors({
-      origin: "https://drill-app.vercel.app", // Use explicit URL to save space
+      origin: [
+        "https://drill-app.vercel.app",
+        "http://localhost:5173"
+      ],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],

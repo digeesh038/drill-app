@@ -11,12 +11,12 @@ const LandingPage = ({ user, onSignIn }) => (
 
     {!user ? (
       <>
-        <button
-          onClick={onSignIn}
-          className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+        <a
+          href={onSignIn}
+          className="bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-colors inline-block"
         >
           Sign in with Google
-        </button>
+        </a>
       </>
     ) : (
       <p className="text-green-600 font-semibold">

@@ -86,27 +86,15 @@ function App() {
     }
   }, [user]);
 
-  const handleSignIn = () => {
-    if (!API_URL) {
-      console.error("API_URL is not defined in environment variables");
-      return;
-    }
-    // Ensure we are redirecting to the full backend path
-    window.location.href = `${API_URL}/auth/google`;
-  };
-
-  const handleLogout = async (navigate) => {
-    await safeFetch(`${API_URL}/auth/logout`);
-    setUser(null);
-    navigate("/");
-  };
+  const loginUrl = `${API_URL}/auth/google`;
+  console.log("Login URL prepared:", loginUrl);
 
   return (
     <Router>
       {user && <Navbar user={user} onLogout={handleLogout} />}
 
       <Routes>
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage onSignIn={handleSignIn} />} />
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage onSignIn={loginUrl} />} />
         <Route path="/dashboard" element={user ? <DashboardPage drills={drills} user={user} /> : <Navigate to="/" />} />
         <Route path="/drills/:drillId" element={<DrillWrapper drills={drills} onNewAttempt={attempt => setHistory(prev => [attempt, ...prev])} />} />
         <Route path="/history" element={user ? <HistoryWrapper history={history} /> : <Navigate to="/" />} />

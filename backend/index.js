@@ -27,15 +27,16 @@ mongoose.connect(process.env.DB_URI)
     applyMiddleware(app);
 
     app.use(session({
+      name: "drill_sid", // Custom name to avoid header conflicts
       secret: process.env.SESSION_SECRET || "default_secret",
       resave: false,
       saveUninitialized: false,
-      proxy: true, // Required for Render
+      proxy: true,
       cookie: {
-        secure: true,
+        secure: process.env.NODE_ENV === "production", // Secure only in prod
         httpOnly: true,
-        sameSite: "none",
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 24 * 60 * 60 * 1000
       }
     }));
 
