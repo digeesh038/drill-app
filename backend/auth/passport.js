@@ -11,7 +11,7 @@ passport.use(
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
             callbackURL: `${process.env.API_URL}/api/auth/google/callback`,
-            proxy: true,
+            proxy: process.env.NODE_ENV === "production",
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
@@ -21,6 +21,7 @@ passport.use(
                     user = await User.create({
                         email: profile.emails[0].value,
                         name: profile.displayName,
+                        role: "user",
                         providers: [{ provider: "google", providerId: profile.id }]
                     });
                 }

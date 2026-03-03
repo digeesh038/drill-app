@@ -4,95 +4,93 @@ import { calculateScore } from "../utils/scoring.js";
 import { requireAuth } from "../utils/auth.js";
 import Attempt from "../models/Attempt.js";
 import Drill from "../models/Drill.js";
+import User from "../models/User.js";
 
 const router = Router();
 
-// Schema accepts both string/number for questionId
+// Schema accepts any answer type (string or array)
 const attemptSchema = z.object({
   drillId: z.number(),
   answers: z.array(z.object({
-    questionId: z.union([z.string(), z.number()]),
-    answer: z.string()
+    questionId: z.string(),
+    answer: z.any()
   })),
 });
 
-// POST /api/attempts
+// ✅ POST /api/attempts (Submit a drill)
 router.post("/", requireAuth, async (req, res) => {
-  const result = attemptSchema.safeParse(req.body);
+  const parseResult = attemptSchema.safeParse(req.body);
 
-  if (!result.success) {
+  if (!parseResult.success) {
     return res.status(400).json({
-      error: { code: 400, message: "Invalid request format" },
-      details: result.error.errors,
+      error: "Invalid request format. Ensure drillId and answers array are present.",
+      details: parseResult.error.errors,
     });
   }
 
-  const { drillId, answers } = result.data;
+  const { drillId, answers } = parseResult.data;
+  const userId = req.user._id.toString();
 
   try {
-    // 🔹 Find drill by numeric drillId
-    const drill = await Drill.findOne({ drillId });
-
-    if (!drill) {
-      return res
-        .status(404)
-        .json({ error: { code: 404, message: "Drill not found" } });
+    // 🛡️ Guard: Check if user already completed this drill
+    const existing = await Attempt.findOne({ drillId, userId });
+    if (existing) {
+      return res.status(403).json({ error: "Attempt Blocked: You have already completed this diagnostic session." });
     }
 
-    // 🔹 Normalize answers so questionId is always string
-    const normalizedAnswers = answers.map(a => ({
-      questionId: String(a.questionId),
-      answer: a.answer,
-    }));
-
-    // 🔹 Validate that all questionIds exist in the drill
-    const isValid = normalizedAnswers.every(a =>
-      drill.questions.some(q => q.id === a.questionId)
-    );
-
-    if (!isValid) {
-      return res
-        .status(400)
-        .json({ error: { code: 400, message: "Invalid questionId in answers" } });
+    // 🔹 Find drill
+    const drill = await Drill.findOne({ drillId });
+    if (!drill) {
+      return res.status(404).json({ error: "Matrix Error: Drill target not found in database." });
     }
 
     // 🔹 Score the attempt
-    const score = calculateScore(normalizedAnswers, drill.questions);
+    const score = calculateScore(answers, drill.questions);
 
-    // 🔹 Save attempt
+    // 🔹 Save attempt with detailed info for history
     const attempt = new Attempt({
       drillId,
-      answers: normalizedAnswers,
+      drillTitle: drill.title,
+      answers,
       score,
+      totalQuestions: drill.questions.length,
       createdAt: new Date(),
-      userId: req.user?._id?.toString() || "guest",
+      userId,
+      userName: req.user.name || "Unknown User",
+      userEmail: req.user.email
     });
 
     await attempt.save();
 
+    // 🏆 Accumulate score on User document
+    if (score > 0) {
+      await User.findByIdAndUpdate(userId, { $inc: { totalScore: score } });
+      console.log(`🏆 User ${req.user.email} earned +${score} points. New total recorded.`);
+    }
+
     res.json(attempt);
   } catch (err) {
     console.error("❌ Error saving attempt:", err);
-    res.status(500).json({ error: "Failed to save attempt" });
+    res.status(500).json({ error: "Failed to save attempt. Server error." });
   }
 });
 
-// GET /api/attempts
+// ✅ GET /api/attempts (Fetch history)
 router.get("/", requireAuth, async (req, res) => {
-  const limit = parseInt(req.query.limit, 10) || 5;
-
   try {
-    const mongoAttempts = await Attempt.find({
-      userId: req.user?._id?.toString() || "guest",
-    })
+    // 👁️ Admin sees EVERYTHING, regular users only see their own
+    const filter = req.user.role === "admin" ? {} : { userId: req.user._id.toString() };
+
+    console.log(`📜 Fetching history for user: ${req.user.email} (Role: ${req.user.role})`);
+
+    const history = await Attempt.find(filter)
       .sort({ createdAt: -1 })
-      .limit(limit)
       .lean();
 
-    res.json(mongoAttempts);
+    res.json(history);
   } catch (err) {
-    console.error("❌ Error fetching attempts:", err);
-    res.status(500).json({ error: "Failed to fetch attempts" });
+    console.error("❌ Error fetching history:", err);
+    res.status(500).json({ error: "Failed to fetch history" });
   }
 });
 

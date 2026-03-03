@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "./passport.js";
 import { requireAuth } from "../utils/auth.js";
+import User from "../models/User.js";
 
 const router = Router();
 
@@ -34,6 +35,32 @@ router.get(
 
 /*
 |--------------------------------------------------------------------------
+| Admin Login (Email/Password)
+|--------------------------------------------------------------------------
+*/
+
+router.post("/admin-login", async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findOne({ email, role: "admin" });
+
+        if (!user || user.password !== password) {
+            return res.status(401).json({ error: "Invalid admin credentials" });
+        }
+
+        // Manually establish session
+        req.login(user, (err) => {
+            if (err) return res.status(500).json({ error: "Login failed" });
+            res.json({ message: "Admin logged in", user: { name: user.name, email: user.email, role: user.role } });
+        });
+    } catch (err) {
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
 | Get Current User
 |--------------------------------------------------------------------------
 */
@@ -48,6 +75,8 @@ router.get("/me", requireAuth, (req, res) => {
             id: req.user._id?.toString(),
             name: req.user.name,
             email: req.user.email,
+            role: req.user.role,
+            totalScore: req.user.totalScore || 0,
         });
     } catch (error) {
         console.error("Error fetching user info:", error);

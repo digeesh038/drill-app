@@ -4,19 +4,36 @@ function calculateScore(userAnswers, drillQuestions) {
   if (!Array.isArray(userAnswers) || !Array.isArray(drillQuestions)) return 0;
 
   drillQuestions.forEach((q) => {
-    // normalize IDs to string
-    const userAns = userAnswers.find(
+    const userAnsDoc = userAnswers.find(
       (a) => String(a.questionId) === String(q.id)
     );
 
-    if (
-      userAns &&
-      userAns.answer &&
-      q.correctAnswer &&
-      userAns.answer.trim().toLowerCase() ===
-        q.correctAnswer.trim().toLowerCase()
-    ) {
-      score++;
+    if (!userAnsDoc || !userAnsDoc.answer) return;
+
+    const userAns = userAnsDoc.answer;
+    const type = q.type || 'fillup';
+
+    if (type === 'checkbox') {
+      // Multi-select: userAns and q.correctAnswers should both be arrays
+      const userArray = Array.isArray(userAns) ? userAns : [userAns];
+      const correctArray = q.correctAnswers || (q.correctAnswer ? [q.correctAnswer] : []);
+
+      if (userArray.length === correctArray.length) {
+        const sortedUser = [...userArray].map(v => v.trim().toLowerCase()).sort();
+        const sortedCorrect = [...correctArray].map(v => v.trim().toLowerCase()).sort();
+
+        const isMatch = sortedUser.every((val, index) => val === sortedCorrect[index]);
+        if (isMatch) score++;
+      }
+    } else {
+      // MCQ/Fillup: Single string match
+      const correct = q.correctAnswer || (q.correctAnswers && q.correctAnswers[0]) || "";
+      if (
+        userAns.toString().trim().toLowerCase() ===
+        correct.toString().trim().toLowerCase()
+      ) {
+        score++;
+      }
     }
   });
 

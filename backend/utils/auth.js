@@ -1,12 +1,16 @@
-// server/utils/auth.js
 export const requireAuth = (req, res, next) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return next();
+  }
   if (req.user) {
     return next();
   }
+  res.status(401).json({ error: "Unauthorized: Please log in to proceed." });
+};
 
-  if (req.session && req.session.userId) {
+export const requireAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
     return next();
   }
-
-  res.status(401).json({ error: "Not logged in" });
+  res.status(403).json({ error: "Forbidden: Administrators only." });
 };

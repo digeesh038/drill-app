@@ -5,10 +5,14 @@ export const safeFetch = async (url, options = {}) => {
             headers: options.method && options.method !== 'GET' ? { "Content-Type": "application/json" } : {},
             ...options,
         });
-        if (!res.ok) return null;
-        return await res.json();
+
+        const data = await res.json();
+        if (!res.ok) {
+            return { error: data.error || data.message || "Request failed" };
+        }
+        return data;
     } catch (err) {
         console.error("Fetch error:", err);
-        return null;
+        return { error: "Network error. Please try again." };
     }
 };

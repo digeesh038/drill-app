@@ -5,6 +5,7 @@ import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
 import passport from "./auth/passport.js";
+import User from "./models/User.js";
 import applyMiddleware from "./middleware/index.js";
 import healthRouter from "./routes/health.js";
 import drillsRouter from "./routes/drills.js";
@@ -17,6 +18,30 @@ const PORT = process.env.PORT || 3001;
 mongoose.connect(process.env.DB_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
+
+    // 🔥 Seed Admin User
+    const seedAdmin = async () => {
+      try {
+        // Find by email and ensure role is 'admin' (Self-healing seed)
+        let admin = await User.findOne({ email: "admin@drill.com" });
+        if (!admin) {
+          await User.create({
+            email: "admin@drill.com",
+            name: "Primary Admin",
+            role: "admin",
+            password: "admin123"
+          });
+          console.log("🛡️ Admin user seeded");
+        } else if (admin.role !== "admin") {
+          admin.role = "admin";
+          await admin.save();
+          console.log("🛡️ Admin role restored for primary account");
+        }
+      } catch (err) {
+        console.error("❌ Admin seeding failed:", err);
+      }
+    };
+    seedAdmin();
 
     const app = express();
 
