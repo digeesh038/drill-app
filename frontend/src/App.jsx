@@ -86,7 +86,14 @@ function App() {
     }
   }, [user]);
 
-  const handleSignIn = () => window.location.href = `${API_URL}/auth/google`;
+  const handleSignIn = () => {
+    if (!API_URL) {
+      console.error("API_URL is not defined in environment variables");
+      return;
+    }
+    // Ensure we are redirecting to the full backend path
+    window.location.href = `${API_URL}/auth/google`;
+  };
 
   const handleLogout = async (navigate) => {
     await safeFetch(`${API_URL}/auth/logout`);
