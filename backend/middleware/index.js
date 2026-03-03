@@ -7,10 +7,24 @@ function applyMiddleware(app) {
   // Security headers
   app.use(helmet());
 
-  // CORS (adjust frontend URL later)
+  // CORS (Production + Local support)
   app.use(
     cors({
-      origin: "http://localhost:5173", // replace in prod
+      origin: function (origin, callback) {
+        const allowedOrigins = [
+          "http://localhost:5173",
+          process.env.FRONTEND_URL
+        ];
+
+        // allow requests with no origin (like mobile apps, curl)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
       credentials: true,
     })
   );
@@ -24,7 +38,10 @@ function applyMiddleware(app) {
       windowMs: 15 * 60 * 1000,
       max: 100,
       message: {
-        error: { code: 429, message: "Too many requests, please try again later." },
+        error: {
+          code: 429,
+          message: "Too many requests, please try again later.",
+        },
       },
     })
   );
