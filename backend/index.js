@@ -3,7 +3,6 @@ dotenv.config();
 
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import session from "express-session";
 import passport from "./auth/passport.js";
 import applyMiddleware from "./middleware/index.js";
@@ -21,21 +20,11 @@ mongoose.connect(process.env.DB_URI)
 
     const app = express();
 
-    // Required for Render (behind proxy)
+    // Required for Render (important for secure cookies)
     app.set("trust proxy", 1);
 
-    // Parse JSON and URL-encoded bodies
-    app.use(express.json());
-    app.use(express.urlencoded({ extended: true }));
-
-    // Apply custom middleware
+    // Apply middleware (helmet, cors, rateLimit, json)
     applyMiddleware(app);
-
-    // CORS setup (Production + Local)
-    app.use(cors({
-      origin: process.env.FRONTEND_URL, // from Render env
-      credentials: true
-    }));
 
     // Session setup
     app.use(session({
@@ -43,9 +32,9 @@ mongoose.connect(process.env.DB_URI)
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: true,          // required for HTTPS (Render)
+        secure: true,      // HTTPS required
         httpOnly: true,
-        sameSite: "none"       // required for cross-site cookies
+        sameSite: "none"   // Required for cross-domain
       }
     }));
 

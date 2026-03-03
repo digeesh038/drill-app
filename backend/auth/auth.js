@@ -4,22 +4,40 @@ import { requireAuth } from "../utils/auth.js";
 
 const router = Router();
 
-// Start Google OAuth login
+/*
+|--------------------------------------------------------------------------
+| Google Login
+|--------------------------------------------------------------------------
+*/
+
+// Start Google OAuth
 router.get(
     "/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        prompt: "select_account"
+    })
 );
 
 // Google OAuth callback
 router.get(
     "/google/callback",
     passport.authenticate("google", {
-        failureRedirect: process.env.FRONTEND_URL + "/login",
-        successRedirect: process.env.FRONTEND_URL + "/dashboard",
-    })
+        failureRedirect: process.env.FRONTEND_URL,
+        session: true,
+    }),
+    (req, res) => {
+        // Successful login
+        res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    }
 );
 
-// Get current logged-in user
+/*
+|--------------------------------------------------------------------------
+| Get Current User
+|--------------------------------------------------------------------------
+*/
+
 router.get("/me", requireAuth, (req, res) => {
     try {
         if (!req.user) {
@@ -30,7 +48,6 @@ router.get("/me", requireAuth, (req, res) => {
             id: req.user._id?.toString(),
             name: req.user.name,
             email: req.user.email,
-            googleId: req.user.googleId,
         });
     } catch (error) {
         console.error("Error fetching user info:", error);
@@ -38,15 +55,21 @@ router.get("/me", requireAuth, (req, res) => {
     }
 });
 
+/*
+|--------------------------------------------------------------------------
+| Logout
+|--------------------------------------------------------------------------
+*/
 
-// Logout
 router.get("/logout", (req, res) => {
-    req.logout(err => {
-        if (err) return res.status(500).json({ error: "Logout failed" });
-
-        // Destroy session on server and clear cookie in browser
+    req.logout(() => {
         req.session.destroy(() => {
-            res.clearCookie("connect.sid", { path: "/" });
+            res.clearCookie("connect.sid", {
+                path: "/",
+                sameSite: "none",
+                secure: true,
+            });
+
             res.json({ message: "Logged out successfully" });
         });
     });
