@@ -1,176 +1,136 @@
-# Create README.md and write content
 # 🧠 Drill App
 
-A full-stack MERN (MongoDB, Express, React, Node.js) application for creating, taking, and tracking coding/drill exercises.
+A professional, full-stack MERN application designed for creating, taking, and tracking coding/drill exercises with integrated Google Authentication.
+
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![React](https://img.shields.io/badge/Frontend-React%2019-61DAFB?logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Backend-Node.js-339933?logo=node.js)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Framework-Express%205-000000?logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb)](https://www.mongodb.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind%20CSS-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
 ---
 
-## 1. Features
-- **Create Custom Drills**: Define your own coding exercises with questions, difficulty, and tags.  
-- **Submit Answers**: Take drills and submit your answers to be scored.  
-- **Track Progress**: View your performance with scores for each drill.  
-- **Full-Stack**: React.js frontend + Node.js/Express backend + MongoDB persistence.
+## 🚀 Key Features
+
+- **🎯 Interactive Drills**: Create custom coding exercises with specific questions, difficulty levels, and tags.
+- **📝 Real-time Submissions**: Take drills and receive instant scoring and feedback.
+- **📊 Progress Tracking**: Monitor your performance history and scores.
+- **🔐 Secure Authentication**: Integrated Google OAuth 2.0 for seamless and secure user login.
+- **🛡️ Robust Security**: Protected API endpoints using JWT, Helmet, and Rate Limiting.
+- **⚡ Modern Tech Stack**: Built with the latest versions of React, Express, and Vite for optimal performance.
 
 ---
 
-## 2. Installation & Setup
+## 🛠️ Technology Stack
 
-### Prerequisites
-- Node.js (v18+)  
-- npm  
-- MongoDB (local or cloud instance)
+### **Frontend**
+- **Framework**: [React 19](https://react.dev/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Routing**: [React Router DOM](https://reactrouter.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) with [PostCSS](https://postcss.org/)
+- **Auth/Backend Services**: [Firebase](https://firebase.google.com/)
+- **Linting**: [ESLint](https://eslint.org/)
 
-### 1. Clone the repository
+### **Backend**
+- **Runtime**: [Node.js](https://nodejs.org/)
+- **Framework**: [Express 5](https://expressjs.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) using [Mongoose ODM](https://mongoosejs.com/)
+- **Authentication**: [Passport.js](http://www.passportjs.org/) (Google OAuth 2.0 Strategy) & [JWT](https://jwt.io/)
+- **Validation**: [Zod](https://zod.dev/)
+- **Security**: [Helmet](https://helmetjs.github.io/), [CORS](https://github.com/expressjs/cors), [Express Rate Limit](https://www.npmjs.com/package/express-rate-limit)
+- **Dev Tools**: [Nodemon](https://nodemon.io/)
+
+---
+
+## 📂 Project Structure
+
+```text
+.
+├── backend/            # Express.js server and API
+│   ├── auth/           # Passport & authentication logic
+│   ├── middleware/     # Custom Express middlewares
+│   ├── models/         # Mongoose schemas
+│   ├── routes/         # API endpoint definitions
+│   └── utils/          # Helper functions
+├── frontend/           # React application
+│   ├── src/            # Components, pages, and logic
+│   └── public/         # Static assets
+└── docker-compose.yml   # Docker orchestration (optional)
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### **1. Prerequisites**
+- Node.js (v18+)
+- npm or yarn
+- MongoDB (Local or Atlas instance)
+
+### **2. Clone & Install**
 ```bash
 git clone https://github.com/digeesh038/drill-app.git
 cd drill-app
+
+# Install Backend dependencies
+cd backend
+npm install
+
+# Install Frontend dependencies
+cd ../frontend
+npm install
 ```
 
-### 2. Configure Environment Variables
+### **3. Environment Configuration**
 
-Create .env files in both backend and frontend folders.
+Create `.env` files in both directories:
 
-backend/.env
-
-```
-PORT=5000
+**`backend/.env`**
+```env
+PORT=3001
 MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+GOOGLE_CLIENT_ID=your_google_id
+GOOGLE_CLIENT_SECRET=your_google_secret
+SESSION_SECRET=your_session_secret
 ```
 
-frontend/.env
-
-```
+**`frontend/.env`**
+```env
 VITE_API_URL=http://localhost:3001/api
 ```
 
-Replace your_mongodb_connection_string with your MongoDB URI.
+### **4. Run the Application**
 
-### 3. Install Dependencies
-
-**Backend**
-```bash
-cd backend
-npm install
-```
-
-**Frontend**
-```bash
-cd ../frontend
-npm install
-```
-
-### 4. Run the App
-
-**Start the Backend API**
+**Start Backend (Development):**
 ```bash
 cd backend
 npm run dev
 ```
-API runs at: http://localhost:3001/api
 
-**Start the Frontend App**
+**Start Frontend:**
 ```bash
-cd ../frontend
+cd frontend
 npm run dev
 ```
-Frontend runs at: http://localhost:5173 (Vite default)
 
 ---
 
-## 3. Backend API
+## 🔌 API Endpoints (Quick Reference)
 
-### 3.1 Create a Drill
-**Endpoint:** POST /api/drills  
-**Description:** Creates a new drill exercise in the database.
-
-**Request Body Example:**
-```json
-{
-  "drillId": 1,
-  "title": "CSS Basics",
-  "difficulty": "Easy",
-  "tags": ["css", "frontend"],
-  "questions": [
-    { "id": 1, "text": "What is the difference between relative and absolute positioning?", "correctAnswer": "a" },
-    { "id": 2, "text": "Explain inline, block, and inline-block elements.", "correctAnswer": "b" }
-  ]
-}
-```
-
-**Response Example:**
-```json
-{
-  "success": true,
-  "message": "Drill created successfully",
-  "drill": {
-    "drillId": 1,
-    "title": "CSS Basics",
-    "difficulty": "Easy",
-    "tags": ["css", "frontend"],
-    "questions": [
-      { "id": 1, "text": "...", "correctAnswer": "a" },
-      { "id": 2, "text": "...", "correctAnswer": "b" }
-    ]
-  }
-}
-```
-
-### 3.2 Submit Answers
-**Endpoint:** POST /api/answers  
-**Description:** Submits a user's answers for a drill and returns their score.
-
-**Request Body Example:**
-```json
-{
-  "drillId": 1,
-  "answers": [
-    { "questionId": 1, "answer": "a" },
-    { "questionId": 2, "answer": "b" }
-  ]
-}
-```
-
-**Response Example:**
-```json
-{
-  "success": true,
-  "message": "Answers submitted successfully",
-  "score": 2,
-  "totalQuestions": 2
-}
-```
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **POST** | `/api/drills` | Create a new drill exercise |
+| **GET** | `/api/drills` | Retrieve all drills |
+| **POST** | `/api/answers` | Submit answers for scoring |
+| **GET** | `/api/auth/google` | Initiate Google OAuth login |
 
 ---
 
-## 4. API Testing & Data Structure
+## 📜 License
+Distributed under the **ISC License**. See `LICENSE` for more information.
 
-### 4.1 API Testing Examples (cURL)
+---
+Developed with ❤️ by [Digeesh](https://github.com/digeesh038)
 
-**Create a Drill**
-```bash
-curl -X POST http://localhost:3001/api/drills \
--H "Content-Type: application/json" \
--d '{
-  "drillId": 1,
-  "title": "CSS Basics",
-  "difficulty": "Easy",
-  "tags": ["css", "frontend"],
-  "questions": [
-    { "id": 1, "text": "What is the difference between relative and absolute positioning?", "correctAnswer": "a" },
-    { "id": 2, "text": "Explain inline, block, and inline-block elements.", "correctAnswer": "b" }
-  ]
-}'
-```
-
-**Submit Answers**
-```bash
-curl -X POST http://localhost:3001/api/answers \
--H "Content-Type: application/json" \
--d '{
-  "drillId": 1,
-  "answers": [
-    { "questionId": 1, "answer": "a" },
-    { "questionId": 2, "answer": "b" }
-  ]
-}'
-```
